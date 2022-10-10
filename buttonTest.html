@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body> 
+<h1 style="position:absolute;left: 15%;"> I3B29 X'mas Tree</h1>
+<p style="position:absolute;left: 15%;top:3vw;">記得先關掉再開另一個模式</p>
+<button id="controller" style="position:absolute;left: 15%;top:6vw;">start</button>
+<button id="controller2" style="position:absolute;left: 20%;top:6vw;">start Random</button>
+
+<div id="tree">
+<img src='https://i.imgur.com/omX5Drl.png' 
+	 style="position:absolute;
+			top:0vw;
+			left: 30%; 
+			height:100%;
+			width:40%;
+			z-index:-1"></div>
+
+<!--
+<div id="light0" 
+	  style="background-color: rgb(6, 55, 116); 
+			 width: 10%; 
+			 position: absolute; 
+			 left: 56.9071%; 
+			 top: 46.903%;">light0 is off</div>
+
+<div id="light1" 
+	 style="background-color: rgb(116, 60, 6); 
+			width: 10%; 
+			position: absolute; 
+			left: 3.84274%; 
+			top: 16.8099%;">light1 is off</div>
+
+<div id="light2" 
+	 style="background-color: rgb(76, 116, 6); 
+	 width: 10%; position: absolute; 
+	 left: 1.57504%; 
+	 top: 26.458%;">light2 is off</div>
+-->
+	 
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+
+
+<script>
+class Lamp {
+
+  constructor(name) {
+    this.name = name + Lamp.id++;
+    this.myStatus = true;
+    this.powerState = false;
+	this.powerStateR = false;
+	
+    let el = document.createElement ('div');
+    el.id = this.name;
+	
+	//let text = document.createTextNode (' ');
+    //el.appendChild(text);
+	
+    let tree = document.getElementById('tree');
+    tree.appendChild(el);
+    this.hue = Math.random()*360;
+
+    // styles
+    el.setAttribute ("style", `background-color: hsl(${this.hue}, 90%, 50%); width:10%`);
+    //樹寬0.4~0.6
+	//this.left = (Math.random()*(0.55-0.45) + 0.45).toFixed(2);
+	if(Lamp.id <= 4)
+		this.left = 0.4 + Lamp.id / 25;//4 5 6 7 8 9
+	else if(Lamp.id > 4 && Lamp.id < 10)    //2 1 0 -1   
+		this.left = 0.4 + (4 +(4 - Lamp.id)) / 25;
+	else if(Lamp.id >= 10)
+		this.left = 0.4 + (Lamp.id - 10) / 25;
+	//樹高0.09~0.8
+    //this.top = (Math.random()*(0.73-0.09) + 0.09).toFixed(2);
+	this.top = 0.09 + Lamp.id / 25;	
+	
+	el.style.cssText = "position:absolute; width:20px; height:20px; border-radius:15px; z-index:1"; 
+    el.style.position = "absolute";
+    el.style.left = this.left*100 +'%'; 
+    el.style.top = this.top*100 +'%';
+  }
+	
+  toggle(power) {
+    this.myStatus = ! this.myStatus;
+	if (this.myStatus === true) {
+		$('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,80%)`);    
+	} else {
+		$('#'+this.name).css('backgroundColor', `hsl(${this.hue}, 90%, 10%)`);
+		//$('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,24%)`);
+	}if(power === false){
+		this.myStatus = false;
+		$('#'+this.name).css('backgroundColor', `hsl(${this.hue}, 90%, 10%)`);
+	}
+}
+
+
+  startBlink(i) {   
+	var that = this;
+	var shine = 0;
+	var T = (Math.random()*(2000-1000) + 1000);
+	that.toggle(this.powerState);
+	
+	$('#controller').click(function() {
+		if(shine)
+			clearInterval(shine);
+		this.powerState = ! this.powerState;
+		if(i>0)
+			this.powerState = ! this.powerState;
+			
+		if (this.powerState === true) {
+			this.powerStateR = false;
+			$('#controller2').text("start Random");
+			shine = setInterval(function(){that.toggle(this.powerState);}, 500);
+			$('#controller').text("pause");
+			
+		}else{
+		
+			that.toggle(this.powerState);
+			$('#controller').text("start");
+		}
+	});
+	$('#controller2').click(function() {
+		if(shine)
+			clearInterval(shine);
+		this.powerStateR = ! this.powerStateR;
+		if(i>0)
+			this.powerStateR = ! this.powerStateR;
+			
+		if (this.powerStateR === true) {
+			this.powerState = false;
+			$('#controller').text("start");	
+			
+			shine = setInterval(function(){that.toggle(this.powerStateR);}, T);
+			$('#controller2').text("pause Random");
+			
+		}else{
+			that.toggle(this.powerStateR);
+			$('#controller2').text("start Random");
+		}
+	});
+	
+	}
+} 
+
+
+Lamp.id = 0; // class variable
+
+for (let i = 0; i < 15; i++) {
+   var ll = new Lamp ('light');   
+   ll.startBlink(i);
+}
+
+</script>
+</body>
+</html>
