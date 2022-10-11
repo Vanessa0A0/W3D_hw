@@ -15,27 +15,6 @@
 			height:100%;
 			width:40%;
 			z-index:-1"></div>
-<!--
-<div id="light0" 
-	  style="background-color: rgb(6, 55, 116); 
-			 width: 10%; 
-			 position: absolute; 
-			 left: 56.9071%; 
-			 top: 46.903%;">light0 is off</div>
-
-<div id="light1" 
-	 style="background-color: rgb(116, 60, 6); 
-			width: 10%; 
-			position: absolute; 
-			left: 3.84274%; 
-			top: 16.8099%;">light1 is off</div>
-
-<div id="light2" 
-	 style="background-color: rgb(76, 116, 6); 
-	 width: 10%; position: absolute; 
-	 left: 1.57504%; 
-	 top: 26.458%;">light2 is off</div>
--->
 	 
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 
@@ -59,7 +38,7 @@ class Lamp {
     this.hue = Math.random()*360;
 
     // styles
-    el.setAttribute ("style", `background-color: hsl(${this.hue}, 90%, 50%); width:10%`);
+    el.setAttribute ("style", `background-color: hsl(0, 0%, 35%); width:10%`);
     //樹寬0.4~0.6
 	//this.left = (Math.random()*(0.55-0.45) + 0.45).toFixed(2);
 	if(Lamp.id <= 4)
@@ -83,11 +62,11 @@ class Lamp {
 	if (this.myStatus === true) {
 		$('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,80%)`);    
 	} else {
-		$('#'+this.name).css('backgroundColor', `hsl(${this.hue}, 90%, 10%)`);
+		$('#'+this.name).css('backgroundColor', `hsl(0, 0%, 35%)`);
 		//$('#'+this.name).css('backgroundColor', `hsl(${this.hue},90%,24%)`);
 	}if(power === false){
 		this.myStatus = false;
-		$('#'+this.name).css('backgroundColor', `hsl(${this.hue}, 90%, 10%)`);
+		$('#'+this.name).css('backgroundColor', `hsl(0, 0%, 35%)`);
 	}
 }
 
