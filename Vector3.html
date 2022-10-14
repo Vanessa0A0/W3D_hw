@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#box{
+  position:absolute;
+  width:250px;
+  height:250px;
+  color:black;
+  background:#eee;
+  border-radius: 10px;
+ }
+#box1{
+  position:absolute;
+  top:300px;
+  width:250px;
+  height:250px;
+  color:black;
+  background:#eee;
+  border-radius: 10px;
+ }
+ #box2{
+  position:absolute;
+  left: 300px;
+  width:250px;
+  height:400px;
+  color:black;
+  background:#eee;
+  border-radius: 10px;
+ }
+<!--
+div{
+  width:250px;
+  height:250px;
+  line-height:50px;
+  padding:10px;
+  background:#eee;
+  color:#eee;
+  border-radius: 10px;
+ }-->
+</style>
+</head>
+<body> 
+
+
+<div id="box">	
+	&#86;
+	<hr>&#88; <input type='text' id='vx'>
+	<br>&#89; <input type='text' id='vy'>
+	<br>&#90; <input type='text' id='vz'>
+	<br><button id='bpp'>輸入</button>		
+</div>		
+
+<div id="box1">	
+	&#87;
+	<hr>&#88; <input type='text' id='wx'>
+	<br>&#89; <input type='text' id='wy'>
+	<br>&#90; <input type='text' id='wz'>
+	<br><button id='bpp1'>輸入</button>		
+</div>	
+
+<div id="box2">	
+	inner product
+	<hr>&#86; &#8901; &#87;<input type='text' id='vw'>
+	<br>
+	<br>&#86; &#215; &#87;(vector product)
+	<hr>&#88; <input type='text' id='vwx'>
+	<br>&#89; <input type='text' id='vwy'>
+	<br>&#90; <input type='text' id='vwz'>
+	
+</div>	
+<!------------------------------------------------------------------->
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>
+//1,2,3  X 1,2,-1 = -8,4,0
+var Vx=0,Vy=0, Vz=0, Wx=0, Wy=0, Wz=0;
+//var V = new THREE.Vector3(Vx, Vy, Vz);
+//var W = new THREE.Vector3(Wx, Wy, Wz);
+//var CrossProduct = V.clone();
+//console.log("HI"+CrossProduct);
+
+$('#bpp').click(
+  function() {
+	let V = new THREE.Vector3(Vx, Vy, Vz);
+	let W = new THREE.Vector3(Wx, Wy, Wz);
+	let CrossProduct = V.clone().cross(W);
+    $('#vw').val(Vx*Wx + Vy*Wy + Vz*Wz);
+	$('#vwx').val(CrossProduct.x);
+	$('#vwy').val(CrossProduct.y);
+	$('#vwz').val(CrossProduct.z);
+  }
+);
+$('#vx').change( function() {
+  Vx = $(this).val();
+});
+$('#vy').change( function() {
+  Vy = $(this).val();
+});
+$('#vz').change( function() {
+  Vz = $(this).val();
+});
+
+$('#bpp1').click(
+  function() {
+	let V = new THREE.Vector3(Vx, Vy, Vz);
+	let W = new THREE.Vector3(Wx, Wy, Wz);
+	let CrossProduct = V.clone().cross(W);
+    $('#vw').val(Vx*Wx + Vy*Wy + Vz*Wz);
+	$('#vwx').val(CrossProduct.x);
+	$('#vwy').val(CrossProduct.y);
+	$('#vwz').val(CrossProduct.z);
+  }
+);
+$('#wx').change( function() {
+  Wx = $(this).val();
+});
+$('#wy').change( function() {
+  Wy = $(this).val();
+});
+$('#wz').change( function() {
+  Wz = $(this).val();
+});
+
+
+</script>
+</body>
+</html>
