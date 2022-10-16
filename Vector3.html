@@ -1,31 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html style="height:1000px;weight:1000px">
 <head>
 <style>
 #box{
   position:absolute;
+  left:500px;
   width:250px;
   height:250px;
   color:black;
-  background:#eee;
+  background:#C4E1E1;
   border-radius: 10px;
  }
 #box1{
   position:absolute;
   top:300px;
+  left:500px;
   width:250px;
   height:250px;
   color:black;
-  background:#eee;
+  background:#C4E1E1;
   border-radius: 10px;
  }
  #box2{
   position:absolute;
-  left: 300px;
+  left:800px;
   width:250px;
   height:400px;
   color:black;
-  background:#eee;
+  background:#D8D8EB;
   border-radius: 10px;
  }
 <!--
@@ -42,13 +44,12 @@ div{
 </head>
 <body> 
 
-
 <div id="box">	
 	&#86;
 	<hr>&#88; <input type='text' id='vx'>
 	<br>&#89; <input type='text' id='vy'>
 	<br>&#90; <input type='text' id='vz'>
-	<br><button id='bpp'>輸入</button>		
+<!--<br><button id='bpp'>輸入</button> -->		
 </div>		
 
 <div id="box1">	
@@ -56,7 +57,7 @@ div{
 	<hr>&#88; <input type='text' id='wx'>
 	<br>&#89; <input type='text' id='wy'>
 	<br>&#90; <input type='text' id='wz'>
-	<br><button id='bpp1'>輸入</button>		
+<!--<br><button id='bpp1'>輸入</button>	-->	
 </div>	
 
 <div id="box2">	
@@ -69,16 +70,57 @@ div{
 	<br>&#90; <input type='text' id='vwz'>
 	
 </div>	
+
+<h1 style="position:absolute;left:350px;">Vector <br>I3B29</h1>
 <!------------------------------------------------------------------->
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script>
 //1,2,3  X 1,2,-1 = -8,4,0
-var Vx=0,Vy=0, Vz=0, Wx=0, Wy=0, Wz=0;
-//var V = new THREE.Vector3(Vx, Vy, Vz);
-//var W = new THREE.Vector3(Wx, Wy, Wz);
-//var CrossProduct = V.clone();
-//console.log("HI"+CrossProduct);
+var Vx,Vy, Vz, Wx, Wy, Wz;
+
+//// No need Button version
+function col(){
+	if(!isNaN(Vx)& (!isNaN(Vy))&(!isNaN(Vz))&(!isNaN(Wx))&(!isNaN(Wy))&(!isNaN(Wz))){
+		let V = new THREE.Vector3(Vx, Vy, Vz);
+		let W = new THREE.Vector3(Wx, Wy, Wz);
+		let CrossProduct = V.clone().cross(W);
+		$('#vw').val(Vx*Wx + Vy*Wy + Vz*Wz);
+		$('#vwx').val(CrossProduct.x);
+		$('#vwy').val(CrossProduct.y);
+		$('#vwz').val(CrossProduct.z);
+	}
+}
+
+$('#vx').change( function() {
+  Vx = $(this).val();
+  col();
+});
+$('#vy').change( function() {
+  Vy = $(this).val();
+  col();
+});
+$('#vz').change( function() {
+  Vz = $(this).val();
+  col();
+});
+
+$('#wx').change( function() {
+  Wx = $(this).val();
+  col();
+});
+$('#wy').change( function() {
+  Wy = $(this).val();
+  col();
+});
+$('#wz').change( function() {
+  Wz = $(this).val();
+  col();
+});
+////
+
+
+/* Button Version 
 
 $('#bpp').click(
   function() {
@@ -122,7 +164,7 @@ $('#wz').change( function() {
   Wz = $(this).val();
 });
 
-
+*/
 </script>
 </body>
 </html>

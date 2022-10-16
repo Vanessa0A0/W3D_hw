@@ -8,7 +8,7 @@
 
 -1️⃣ [Christmas Tree](#christmas-tree) ✅
 
--2️⃣ [Vector3](#vector3)
+-2️⃣ [Vector3](#vector3)✅
 
 
 -3️⃣ [Hw3](#hw3)
@@ -21,7 +21,7 @@
 	⚠️若沒關閉原本模式直接切換，會需要點及兩次才有反應
 
 ### Vector3
-	輸入V和W並按下確認後，輸出VW的內積和外積，沒輸入的預設為0
+	輸入V和W後，輸出VW的內積和外積，需輸入完整才有反應
 
 ### Hw3
 	努力中....QWQ
