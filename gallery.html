@@ -5,7 +5,7 @@
 </head>
 <body> 
 <!-- <a href="#">link text</a> -->
-<button id='LightPower'>電源</button>
+<input type=range min=0 max=10 id='LightPower'>亮度</button>
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -16,7 +16,7 @@
 
 class Lamps{
     constructor(x, y, z, style) {
-    this.powerState = true;
+    //this.powerState = true;
 	this.x = x;
 	this.y = y;
 	this.z = z;
@@ -52,20 +52,25 @@ class Lamps{
 	}
 	/**/
   }
-  controlLamps(){
+  controlLamps(i){
+		/*
 		this.powerState = ! this.powerState;
 		if(this.powerState===true){
-		  this.Light.intensity = 0.5;
+		  this.Light.intensity = 1;
 		  scene.add(this.Light);
 		}
 		else{
 		  this.Light.intensity = 0;
 		  scene.add(this.Light);
 		}
+		*/
+		//this.Light.intensity = ($(this).val())/10;
+		this.Light.intensity = i/10;
  }
 }
 
-var camera, scene, renderer;
+var camera, scene, renderer, camera3rd, useview = false;
+var keyboard = new KeyboardState();
 
 init();
 animate();
@@ -77,11 +82,17 @@ function init() {
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setClearColor(0xffffff);
+	
+	
 	document.body.appendChild(renderer.domElement);
 
 	camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
 	camera.position.z = 500; // camera at (0,0,500)
+	camera3rd = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
+	camera3rd.position.set(-250, 70, 180);
+	
 	let controls = new THREE.OrbitControls(camera, renderer.domElement);
+	//let controls2 = new THREE.OrbitControls(camera3rd, renderer.domElement);
 
  ////////////////////////////////////////////////////////
 ///light
@@ -97,10 +108,10 @@ function init() {
 	
 	//drawLight1 = new Lamps(-210, 150, 130, 2); 
 	
-	$('#LightPower').click(function() {
-		MainLight1.controlLamps();
-		MainLight2.controlLamps();
-		MainLight3.controlLamps();
+	$('#LightPower').change(function() {
+		MainLight1.controlLamps($(this).val());
+		MainLight2.controlLamps($(this).val());
+		MainLight3.controlLamps($(this).val());
 		}
 	);
 	//light.controlLamps();
@@ -120,103 +131,163 @@ function init() {
 	scene.add (chair1,chair2);
 
 ///Floor
-  var floor = buildFloor();
-  scene.add (floor);
+	var floor = buildFloor();
+	scene.add (floor);
 
 ///Walls
 	var wallGroup = new THREE.Group();
 	//walls around
-  wallL = buildWalls(380,120,4,2);
-  wallL.rotation.y = Math.PI/2;
-  wallR = wallL.clone();
-  wallR.rotation.y = -Math.PI/2;
-  wallL.position.set (-260, 60, 0);
-  wallR.position.set (260, 60, 0);
+	wallL = buildWalls(380,120,4,2);
+	wallL.rotation.y = Math.PI/2;
+	wallR = wallL.clone();
+	wallR.rotation.y = -Math.PI/2;
+	wallL.position.set (-260, 60, 0);
+	wallR.position.set (260, 60, 0);
   
-  wallB = buildWalls(520,120,4,2);
-  wallF = wallB.clone();
-  wallF.rotation.y = Math.PI;
-  wallB.position.set (0, 60, -190);
-  wallF.position.set (0, 60, 190);
+	wallB = buildWalls(520,120,4,2);
+	wallF = wallB.clone();
+	wallF.rotation.y = Math.PI;
+	wallB.position.set (0, 60, -190);
+	wallF.position.set (0, 60, 190);
   
-  wallGroup.add(wallL, wallR, wallB, wallF);
+	wallGroup.add(wallL, wallR, wallB, wallF);
   
   //hallway's wall  
-  wallHallway1 = buildWalls(200, 120, 4, 1);
-  wallHallway2 = wallHallway1.clone();
-  wallHallway1.position.set(-160,60,105);
-  wallHallway2.position.set(-160,60,-105);
+	wallHallway1 = buildWalls(200, 120, 4, 1);
+	wallHallway2 = wallHallway1.clone();
+	wallHallway1.position.set(-160,60,105);
+	wallHallway2.position.set(-160,60,-105);
   
-  wallHallway3 = buildWalls(75, 120, 4, 1);
-  wallHallway3.rotation.y = Math.PI/2;
-  wallHallway4 = wallHallway3.clone();
-  wallHallway3.position.set(-61,60,-70);
-  wallHallway4.position.set(-61,60,70);
+	wallHallway3 = buildWalls(75, 120, 4, 1);
+	wallHallway3.rotation.y = Math.PI/2;
+	wallHallway4 = wallHallway3.clone();
+	wallHallway3.position.set(-61,60,-70);
+	wallHallway4.position.set(-61,60,70);
   
-  wallGroup.add(wallHallway1, wallHallway2, wallHallway3, wallHallway4);
+	wallGroup.add(wallHallway1, wallHallway2, wallHallway3, wallHallway4);
   
   //room's wall
-  wallRoomMid = buildWalls(100,120,4,1);
-  wallRoomMid.position.set(180,60,0);
+	wallRoomMid = buildWalls(100,120,4,1);
+	wallRoomMid.position.set(180,60,0);
   
-  wallRoom1 = buildWalls(120,120,4,1);
-  wallRoom1.rotation.y = Math.PI/2;
-  wallRoom2 = wallRoom1.clone();
-  wallRoom1.position.set(80,60,-90);
-  wallRoom2.position.set(80,60,90);
+	wallRoom1 = buildWalls(120,120,4,1);
+	wallRoom1.rotation.y = Math.PI/2;
+	wallRoom2 = wallRoom1.clone();
+	wallRoom1.position.set(80,60,-90);
+	wallRoom2.position.set(80,60,90);
   
-  wallGroup.add(wallRoomMid, wallRoom1, wallRoom2);
-  scene.add (wallGroup);
+	wallGroup.add(wallRoomMid, wallRoom1, wallRoom2);
+	scene.add (wallGroup);
+	
+///Draws
+	draw1 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
+	draw1.position.set(84,65,-90);
+	draw1.rotation.y = Math.PI/2;
+	scene.add (draw1);
 }
 
 function buildFloor(){
-	var FloorGroup = new THREE.Group();
-	let woodTex = new THREE.TextureLoader().load("https://i.imgur.com/DrvlmNW.jpg?1");
+	
+  let woodTex = new THREE.TextureLoader().load("https://i.imgur.com/DrvlmNW.jpg?1");
   let mat = new THREE.MeshLambertMaterial({
     map: woodTex
   });
- var floorTop = new THREE.Mesh(new THREE.BoxGeometry(520, 2, 380), mat);
-	FloorGroup.add(floorTop);
-  return FloorGroup;
+  var floorTop = new THREE.Mesh(new THREE.BoxGeometry(520, 2, 380), mat);
+	
+  return floorTop;
 
 }
 
 function buildWalls(w, h, d, style) {
 	let wall;
-  if(style === 1){
-    wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({
-    color: 0xFFF3EE	
-    }));
-  }
-  if(style === 2){
-  	wall = new THREE.Mesh(new THREE.PlaneGeometry(w, h, d), new THREE.MeshLambertMaterial({
-    color: 0xFFF3EE	
-    }));
-  }
-  return wall;
+	if(style === 1){
+		wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({
+		color: 0xFFF3EE	
+		}));
+	}
+	if(style === 2){
+		wall = new THREE.Mesh(new THREE.PlaneGeometry(w, h, d), new THREE.MeshLambertMaterial({
+		color: 0xFFF3EE	
+		}));
+	}
+	return wall;
 }
 
 function buildChair() {
-  var ChairGroup = new THREE.Group();
-  var woodTex = new THREE.TextureLoader().load("https://i.imgur.com/DrvlmNW.jpg?1");
-  var mat = new THREE.MeshLambertMaterial({
-    map: woodTex
-  });
-  var boxTop = new THREE.Mesh(new THREE.BoxGeometry(65, 4, 20), mat);
-  var boxLeg1 = new THREE.Mesh(new THREE.BoxGeometry(4, 22, 20), mat);
-  var boxLeg2 = new THREE.Mesh(new THREE.BoxGeometry(4, 22, 20), mat);
-  boxTop.position.set(0, 25, 0);
-  boxLeg1.position.set(-30.5, 12, 0);
-  boxLeg2.position.set(30.5, 12, 0);
-  ChairGroup.add(boxTop, boxLeg1, boxLeg2);
-  return ChairGroup;
+	var ChairGroup = new THREE.Group();
+	var woodTex = new THREE.TextureLoader().load("https://i.imgur.com/DrvlmNW.jpg?1");
+	var mat = new THREE.MeshLambertMaterial({
+		map: woodTex
+	});
+	var boxTop = new THREE.Mesh(new THREE.BoxGeometry(65, 4, 20), mat);
+	var boxLeg1 = new THREE.Mesh(new THREE.BoxGeometry(4, 22, 20), mat);
+	var boxLeg2 = new THREE.Mesh(new THREE.BoxGeometry(4, 22, 20), mat);
+	boxTop.position.set(0, 25, 0);
+	boxLeg1.position.set(-30.5, 12, 0);
+	boxLeg2.position.set(30.5, 12, 0);
+	ChairGroup.add(boxTop, boxLeg1, boxLeg2);
+	return ChairGroup;
 }
 
+function buildDraws(w, h, d, drawLink){
+	let Imag = new THREE.TextureLoader().load(drawLink);
+	let mat = new THREE.MeshLambertMaterial({
+		map: Imag
+	});
+	var draws = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+	
+	return draws;
+}
+
+function viewpoint() {
+
+	
+	keyboard.update();
+	
+	if (keyboard.down("space")) {
+		useview = !useview;
+		
+	}if (keyboard.pressed("A")) {
+		camera3rd.translateX(-1);
+		//camera3rd.rotation.y += 0.01;
+		
+	}if (keyboard.pressed("D")) {
+		camera3rd.translateX(1);
+		//camera3rd.rotation.y -= 0.01;
+		
+	}if (keyboard.pressed("W")) {
+		camera3rd.translateZ(-1);
+		//if()
+		//camera3rd.posiiton.x += 0.05;	
+		
+	}if (keyboard.pressed("S")) {
+		camera3rd.translateZ(1);
+		
+	}if(keyboard.pressed("Q")){
+		camera3rd.rotation.y += 0.01;
+		
+	}if(keyboard.pressed("E")){
+		camera3rd.rotation.y -= 0.01;
+	
+	}if(keyboard.pressed("up")){
+		//camera3rd.position.y += 0.01;
+		camera3rd.translateY(1);
+	}if(keyboard.pressed("down")){
+		//camera3rd.position.y -= 0.01;
+		camera3rd.translateY(-1);
+	}
+}
 function animate() {
-
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-
+	viewpoint();
+	requestAnimationFrame(animate);
+	
+	//camera3rd.position.set(0, 100, 0);
+	//camera3rd.lookAt (100,100,100);
+	
+	if (useview)
+		renderer.render(scene, camera3rd);
+	else
+		renderer.render(scene, camera);
 }
 
 </script>
