@@ -14,13 +14,14 @@
 
 <script>
 
+
 class Lamps{
     constructor(x, y, z, d, style) {
     //this.powerState = true;
 	this.x = x;
 	this.y = y;
 	this.z = z;
-	
+	Lamps.id;
 	if(style === 1){
 		this.Light = new THREE.PointLight(0xFFFFFF, 0.3);
 		this.Light.position.set(this.x, this.y, this.z);
@@ -30,14 +31,11 @@ class Lamps{
 		let material = new THREE.MeshBasicMaterial( {color: 0x9D9D9D} );
 		var PointLightLamp = new THREE.Mesh( geometry, material );
 		PointLightLamp.position.set(this.x, this.y, this.z);
-		//PointLightLamp.rotation.x = Math.PI/2;
 		scene.add( PointLightLamp );
-		
-		//var sphereSize = 1;
-		//const pointLightHelper = new THREE.PointLightHelper(this.Light, sphereSize);
-		//scene.add(pointLightHelper);
+
 		
 	}else if(style === 2){
+		Lamps.id++;
 		this.Light = new THREE.SpotLight(0xffffff, 1.3, 140, Math.PI/5.5 , 0.97);
 		this.Light.position.set(this.x, this.y, this.z);
 		this.Light.target = d;
@@ -48,9 +46,14 @@ class Lamps{
 		let material = new THREE.MeshBasicMaterial( {color: 0x7B7B7B} );
 		var spotLightLamp = new THREE.Mesh( geometry, material );
 		spotLightLamp.position.set(this.x, this.y, this.z);
-		spotLightLamp.lookAt(thirdAt);
-		//spotLightLamp.rotation.x = Math.PI/10;
 		
+		//spotLightLamp.lookAt(thirdAt);
+		if(Lamps.id < 3 || Lamps.id === 7)
+			spotLightLamp.rotation.x = Math.PI/6;
+		else if(Lamps.id < 5 || Lamps.id === 5)
+			spotLightLamp.rotation.x = -Math.PI/6;
+		else
+			spotLightLamp.rotation.z = -Math.PI/6;
 		scene.add(spotLightLamp);
 		
 		}
@@ -175,18 +178,19 @@ function init() {
 	draw5 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
 	draw5.position.set(180, 65, -3);
 	draw6 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
-	draw6.position.set(83, 65, -90);
+	draw6.position.set(83, 65, -100);
 	draw6.rotation.y = Math.PI/2;
 	
 	draw7 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
 	draw7.position.set(180, 65, 3);
 	draw8 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
-	draw8.position.set(83, 65, 90);
+	draw8.position.set(83, 65, 100);
 	draw8.rotation.y = Math.PI/2;
 	
 	scene.add (draw1, draw2, draw3, draw4, draw5, draw6, draw7, draw8);
 	
 ///Lamps
+	Lamps.id = 0;
 	
 	MainLight1 = new Lamps(180, 160, -100, 0, 1); 
 	MainLight2 = new Lamps(180, 160, 100, 0, 1); 	
