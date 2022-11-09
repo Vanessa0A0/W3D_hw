@@ -21,6 +21,7 @@ class Lamps{
 	this.x = x;
 	this.y = y;
 	this.z = z;
+	this.lampGroup= new THREE.Object3D();;
 	Lamps.id;
 	if(style === 1){
 		this.Light = new THREE.PointLight(0xFFFFFF, 0.3);
@@ -36,28 +37,54 @@ class Lamps{
 		
 	}else if(style === 2){
 		Lamps.id++;
-		this.Light = new THREE.SpotLight(0xffffff, 1.3, 140, Math.PI/5.5 , 0.97);
+		this.Light = new THREE.SpotLight(0xffffff, 2, 140, Math.PI/5.5 , 0.97);
 		this.Light.position.set(this.x, this.y, this.z);
 		this.Light.target = d;
 		scene.add(this.Light);
 		
-		let thirdAt = d.localToWorld(new THREE.Vector3(0,0,0));
+		//let thirdAt = d.localToWorld(new THREE.Vector3(0,0,0));
+		//var lampGroup 
 		let geometry = new THREE.CylinderGeometry(2, 2, 6);
 		let material = new THREE.MeshBasicMaterial( {color: 0x7B7B7B} );
 		var spotLightLamp = new THREE.Mesh( geometry, material );
 		spotLightLamp.position.set(this.x, this.y, this.z);
+		/*
+		spotLightLamp.rotation.x = Math.PI/2;
+		this.lampGroup.add(spotLightLamp);
+		scene.add(this.lampGroup);
+		this.lampGroup.position.set(this.x, this.y, this.z);
+		this.lampGroup.lookAt(d.position);
+		
+		//lampGroup.add (spotLightLamp);
+		//scene.add(spotLightLamp);
+		//lampGroup.position.copy (this.Light.position);
+		//spotLightLamp.lookAt(d.position);
+		
+		
+		
+		//var lampGroup = new THREE.Group();
+		//var lamp = new THREE.Mesh (new THREE.CylinderGeometry (5,5,20,20), new THREE.MeshNormalMaterial());
+		//lamp.rotation.x = Math.PI/2;
+		//lamp.position.set (0,0,10);
+		//lampGroup.add (lamp, new THREE.AxesHelper(60));
+		//scene.add (lampGroup);
+		//lampGroup.position.copy (spotLight.position);
+		//lampGroup.lookAt (painting.position);
 		
 		//spotLightLamp.lookAt(thirdAt);
+		}
+		*/
 		if(Lamps.id < 3 || Lamps.id === 7)
 			spotLightLamp.rotation.x = Math.PI/6;
 		else if(Lamps.id < 5 || Lamps.id === 5)
 			spotLightLamp.rotation.x = -Math.PI/6;
 		else
 			spotLightLamp.rotation.z = -Math.PI/6;
-		scene.add(spotLightLamp);
 		
+		scene.add(spotLightLamp);
 		}
-		/**/
+		
+		
 	}
 	
 	controlLamps(i){
@@ -67,7 +94,7 @@ class Lamps{
 			if(i <= 0.1)
 				this.Light.intensity = i/100;
 			else
-				this.Light.intensity = (i/100) + 1;
+				this.Light.intensity = (i/100) + 1.3;
 		}
 	}
 
@@ -122,7 +149,7 @@ function init() {
 ///Walls
 	var wallGroup = new THREE.Group();
 	//walls around
-	wallL = buildWalls(380,120,4,2);
+	wallL = buildWalls(400,120,4,2);
 	wallL.rotation.y = Math.PI/2;
 	wallR = wallL.clone();
 	wallR.rotation.y = -Math.PI/2;
@@ -132,8 +159,8 @@ function init() {
 	wallB = buildWalls(520,120,4,2);
 	wallF = wallB.clone();
 	wallF.rotation.y = Math.PI;
-	wallB.position.set (0, 60, -190);
-	wallF.position.set (0, 60, 190);
+	wallB.position.set (0, 60, -200);
+	wallF.position.set (0, 60, 200);
 	wallGroup.add(wallL, wallR, wallB, wallF);
   
   //hallway's wall  
@@ -164,31 +191,74 @@ function init() {
 	scene.add (wallGroup);
 	
 ///Draws
-	draw1 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
-	draw1.position.set(-200, 65, 108);
-	//draw1.rotation.y = Math.PI/2;
-	draw2 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
-	draw2.position.set(-120, 65, 108);
+	draw0 = buildDraws(69,83,2,"https://i.imgur.com/oXnfnft.jpg");
+	draw0.position.set(-257, 65, 0);
+	draw0.rotation.y = Math.PI/2;
 	
-	draw3 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
-	draw3.position.set(-200, 65, -108);
-	draw4 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
-	draw4.position.set(-120, 65, -108);
+	draw1 = buildDraws(63,48,2,"https://i.imgur.com/nnLKm7Z.jpg");
+	draw1.position.set(-210, 70, 108);
+	draw2 = buildDraws(62,75,2,"https://i.imgur.com/21ki6r9.jpg");
+	draw2.position.set(-120, 70, 108);
 	
-	draw5 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
-	draw5.position.set(180, 65, -3);
-	draw6 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
-	draw6.position.set(83, 65, -100);
+	draw3 = buildDraws(80,53,2,"https://i.imgur.com/37IasLA.jpg");
+	draw3.position.set(-205, 70, -108);
+	draw4 = buildDraws(66,84,2,"https://i.imgur.com/g5DNEqt.jpg");
+	draw4.position.set(-115, 70, -108);
+	
+	draw5 = buildDraws(52,64,2,"https://i.imgur.com/b4DjNDL.jpg");
+	draw5.position.set(180, 70, -3);
+	draw6 = buildDraws(78,60,2,"https://i.imgur.com/UKzYcqN.jpg");
+	draw6.position.set(83, 70, -90);
 	draw6.rotation.y = Math.PI/2;
 	
-	draw7 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
-	draw7.position.set(180, 65, 3);
-	draw8 = buildDraws(50,60,2,"https://i.imgur.com/DrvlmNW.jpg?1");
-	draw8.position.set(83, 65, 100);
+	draw7 = buildDraws(63,45,2,"https://i.imgur.com/PC1zShl.jpg");
+	draw7.position.set(180, 70, 3);
+	draw8 = buildDraws(82,66,2,"https://i.imgur.com/vEZKMhJ.jpg");
+	draw8.position.set(83, 70, 90);
 	draw8.rotation.y = Math.PI/2;
 	
-	scene.add (draw1, draw2, draw3, draw4, draw5, draw6, draw7, draw8);
 	
+	scene.add (draw0, draw1, draw2, draw3, draw4, draw5, draw6, draw7, draw8);
+
+///Describe
+	monet = buildDescribe(180,70,2,'https://i.imgur.com/z4giJVk.png');
+	monet.position.set(-130, 65, -101);
+	
+	monetQuote = buildDescribe(140,40,2,'https://i.imgur.com/v6E4W94.png');
+	monetQuote.position.set(-160, 65, 101);
+	monetQuote.rotation.y = Math.PI;
+	
+	d0 = buildDescribe(20,10,2,'https://i.imgur.com/5bIgh8t.jpg');
+	d0.position.set(-259, 25, -50);
+	d0.rotation.y = Math.PI/2;
+	
+	d1 = buildDescribe(18,10,2,'https://i.imgur.com/6JCBE71.jpg');
+	d1.position.set(-185, 35, 108);
+	d2 = buildDescribe(20,10,2,'https://i.imgur.com/ai3znUV.jpg');
+	d2.position.set(-75, 35, 108);
+	
+	d3 = buildDescribe(18,10,2,'https://i.imgur.com/14yUjoN.jpg');
+	d3.position.set(-170, 35, -108);
+	d3.rotation.y = Math.PI;
+	d4 = buildDescribe(18,10,2,'https://i.imgur.com/ExjTmXi.jpg');
+	d4.position.set(-69, 35, -108);
+	d4.rotation.y = Math.PI;
+	
+	d5 = buildDescribe(18,10,2,'https://i.imgur.com/h97eCdC.jpg');
+	d5.position.set(141, 45, -3);
+	d5.rotation.y = -Math.PI;
+	d6 = buildDescribe(20,10,2,'https://i.imgur.com/1WSoFHO.jpg');
+	d6.position.set(83, 30, -125);
+	d6.rotation.y = Math.PI/2;
+	
+	d7 = buildDescribe(18,10,2,'https://i.imgur.com/wihnx55.jpg');
+	d7.position.set(205, 40, 3);
+	d8 = buildDescribe(18,10,2,'https://i.imgur.com/mTFkEWd.jpg');
+	d8.position.set(83, 28, 55);
+	d8.rotation.y = Math.PI/2;
+	
+	scene.add (monet, monetQuote, d0, d1, d2, d3, d4, d5, d6, d7, d8);
+
 ///Lamps
 	Lamps.id = 0;
 	
@@ -196,8 +266,6 @@ function init() {
 	MainLight2 = new Lamps(180, 160, 100, 0, 1); 	
 	MainLight3 = new Lamps(-200, 160, 180, 0, 1);
 	MainLight4 = new Lamps(-200, 160, -180, 0, 1);
-	
-	
 	
 	drawLight1 = new Lamps(-190, 145, 160, draw1, 2); 
 	drawLight2 = new Lamps(-130, 145, 160, draw2, 2); 
@@ -216,7 +284,6 @@ function init() {
 	var MainLights = [MainLight1, MainLight2, MainLight3, MainLight4, 
 	drawLight1, drawLight2, drawLight3, drawLight4, 
 	drawLight5, drawLight6, drawLight7, drawLight8];
-	
 	
 	$('#LightPower').change(function() {
 		for(let i = 0; MainLights[i] != null; i++)
@@ -259,7 +326,7 @@ function init() {
 
 function buildFloor(){
 	
-  let woodTex = new THREE.TextureLoader().load("https://i.imgur.com/DrvlmNW.jpg?1");
+  let woodTex = new THREE.TextureLoader().load("https://i.imgur.com/ghTlNP0.jpg");
   let mat = new THREE.MeshLambertMaterial({
     map: woodTex
   });
@@ -309,13 +376,33 @@ function buildTrack(w, h, d) {
 }
 
 function buildDraws(w, h, d, drawLink){
-	let Imag = new THREE.TextureLoader().load(drawLink);
+	var DrawsGroup = new THREE.Group();
+	let Image = new THREE.TextureLoader().load(drawLink);
 	let mat = new THREE.MeshLambertMaterial({
-		map: Imag
+		map: Image
 	});
 	var draws = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
 	
-	return draws;
+	let frameMap = new THREE.TextureLoader().load ('https://i.imgur.com/PN8xKBF.png');
+	let frame = new THREE.Mesh (new THREE.BoxGeometry(w*1.1, h*1.1, d*1.1), new THREE.MeshLambertMaterial({map:frameMap, transparent:true}));
+	//frame.position.y = 40;
+	
+	DrawsGroup.add(draws, frame);
+	//scene.add (DrawsGroup)
+	
+	return DrawsGroup;
+}
+
+function buildDescribe(w, h, d, describeLink){
+
+	let Image = new THREE.TextureLoader().load(describeLink);
+	let mat = new THREE.MeshLambertMaterial({
+		map: Image, 
+		transparent:true
+	});
+	var describes = new THREE.Mesh(new THREE.PlaneGeometry(w, h, d), mat);
+	
+	return describes;
 }
 
 function viewpoint() {

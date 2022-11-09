@@ -10,8 +10,7 @@
 
 -2️⃣ [Vector3](#vector3)✅
 
-
--3️⃣ [Hw3](#hw3)
+-3️⃣ [室內設計模型](#室內設計模型)
 
 ![](https://github.com/Vanessa0A0/W3D_hw/blob/master/Images/SLir.gif)
 
@@ -23,5 +22,6 @@
 ### Vector3
 	輸入V和W後，輸出VW的內積和外積，需輸入完整才有反應
 
-### Hw3
-	努力中....QWQ
+### 室內設計模型
+	畫廊設計模型，可用space切換視角，切換後WASD移動、QE旋轉、上下鍵移動鏡頭上下
+	⚠️會穿牆
