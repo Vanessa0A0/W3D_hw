@@ -1,11 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+<style>
+#info {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+}
+</style>
 </head>
 <body> 
 <!-- <a href="#">link text</a> -->
-<input type=range min=0 max=45 id='LightPower'>亮度</button>
+<div id = "info">
+<p>
+亮度<input type=range min=0 max=45 id='LightPower'>
+看向<select id="lookAtDraws">
+  <option value="0">返回</option>
+  <optgroup label="莫內 Claude Monet">
+    <option value="1">莫內自畫像</option>
+    <option value="2">印象日出</option>
+    <option value="3">撐傘的女人</option>
+    <option value="4">花園裡的女子</option>
+    <option value="5">日落的海景</option>
+    <option value="6">蒙梭公園</option>
+    <option value="7">昂蒂布之晨</option>
+	<option value="8">盧昂主教堂</option>
+	<option value="9">睡蓮</option>
+  </optgroup>
+</select><br>
+Space切換視角<br>
+WASD移動 QE旋轉 上下鍵鏡頭上下</p>
+</div>
 <script src="https://threejs.org/build/three.min.js"></script>
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -17,12 +44,11 @@
 
 class Lamps{
     constructor(x, y, z, d, style) {
-    //this.powerState = true;
+
 	this.x = x;
 	this.y = y;
 	this.z = z;
-	this.lampGroup= new THREE.Object3D();;
-	Lamps.id;
+
 	if(style === 1){
 		this.Light = new THREE.PointLight(0xFFFFFF, 0.3);
 		this.Light.position.set(this.x, this.y, this.z);
@@ -33,58 +59,26 @@ class Lamps{
 		var PointLightLamp = new THREE.Mesh( geometry, material );
 		PointLightLamp.position.set(this.x, this.y, this.z);
 		scene.add( PointLightLamp );
-
 		
 	}else if(style === 2){
-		Lamps.id++;
+
 		this.Light = new THREE.SpotLight(0xffffff, 2, 140, Math.PI/5.5 , 0.97);
 		this.Light.position.set(this.x, this.y, this.z);
 		this.Light.target = d;
 		scene.add(this.Light);
 		
-		//let thirdAt = d.localToWorld(new THREE.Vector3(0,0,0));
-		//var lampGroup 
+		var lampGroup = new THREE.Object3D();
 		let geometry = new THREE.CylinderGeometry(2, 2, 6);
 		let material = new THREE.MeshBasicMaterial( {color: 0x7B7B7B} );
 		var spotLightLamp = new THREE.Mesh( geometry, material );
-		spotLightLamp.position.set(this.x, this.y, this.z);
-		/*
 		spotLightLamp.rotation.x = Math.PI/2;
-		this.lampGroup.add(spotLightLamp);
-		scene.add(this.lampGroup);
-		this.lampGroup.position.set(this.x, this.y, this.z);
-		this.lampGroup.lookAt(d.position);
 		
-		//lampGroup.add (spotLightLamp);
-		//scene.add(spotLightLamp);
-		//lampGroup.position.copy (this.Light.position);
-		//spotLightLamp.lookAt(d.position);
+		lampGroup.add(spotLightLamp);
+		lampGroup.position.copy(this.Light.position);
+		lampGroup.lookAt(d.position);
+		scene.add(lampGroup);
 		
-		
-		
-		//var lampGroup = new THREE.Group();
-		//var lamp = new THREE.Mesh (new THREE.CylinderGeometry (5,5,20,20), new THREE.MeshNormalMaterial());
-		//lamp.rotation.x = Math.PI/2;
-		//lamp.position.set (0,0,10);
-		//lampGroup.add (lamp, new THREE.AxesHelper(60));
-		//scene.add (lampGroup);
-		//lampGroup.position.copy (spotLight.position);
-		//lampGroup.lookAt (painting.position);
-		
-		//spotLightLamp.lookAt(thirdAt);
 		}
-		*/
-		if(Lamps.id < 3 || Lamps.id === 7)
-			spotLightLamp.rotation.x = Math.PI/6;
-		else if(Lamps.id < 5 || Lamps.id === 5)
-			spotLightLamp.rotation.x = -Math.PI/6;
-		else
-			spotLightLamp.rotation.z = -Math.PI/6;
-		
-		scene.add(spotLightLamp);
-		}
-		
-		
 	}
 	
 	controlLamps(i){
@@ -113,7 +107,8 @@ function init() {
 	renderer = new THREE.WebGLRenderer();
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setClearColor(0xffffff);
-	
+	renderer.shadowMap.enabled = true;///shadow
+	renderer.shadowMap.type = THREE.PCFSoftShadowMap;///shadow
 	
 	document.body.appendChild(renderer.domElement);
 
@@ -127,9 +122,62 @@ function init() {
 	let controls = new THREE.OrbitControls(camera, renderer.domElement);
 	//let controls2 = new THREE.OrbitControls(camera3rd, renderer.domElement);
 
- ////////////////////////////////////////////////////////
-
-
+//////////////////////////////////////////////////////////
+///Look At Draw
+	$('#lookAtDraws').change( function(){
+		switch ($(this).val()) {
+			case "0":
+				camera.position.set(0, 200, 500);
+				camera.lookAt(0, 0, 0);
+				break;
+				
+			case "1":
+				camera.position.set(-160, 65, 0);
+				camera.lookAt(draw0.position);
+				break;
+				
+			case "2":
+				camera.position.set(-210, 70, 180);
+				camera.lookAt(draw1.position);
+				break;
+			
+			case "3":
+				camera.position.set(-120, 70, 190);
+				camera.lookAt(draw2.position);
+				break;
+				
+			case "4":
+				camera.position.set(170, 70, 90);
+				camera.lookAt(draw8.position);
+				break;
+				
+			case "5":
+				camera.position.set(180, 70, 70);
+				camera.lookAt(draw7.position);
+				break;
+				
+			case "6":
+				camera.position.set(180, 70, -70);
+				camera.lookAt(draw5.position);
+				break;
+				
+			case "7":
+				camera.position.set(170, 70, -90);
+				camera.lookAt(draw6.position);
+				break;
+				
+			case "8":
+				camera.position.set(-115, 70, -190);
+				camera.lookAt(draw4.position);
+				break;
+				
+			case "9":
+				camera.position.set(-205, 70, -180);
+				camera.lookAt(draw3.position);
+				break;
+		}
+	
+	});
 	
 ///Chairs
 	var chair = buildChair();
@@ -222,10 +270,10 @@ function init() {
 
 ///Describe
 	monet = buildDescribe(180,70,2,'https://i.imgur.com/z4giJVk.png');
-	monet.position.set(-130, 65, -101);
+	monet.position.set(-130, 65, -102);
 	
 	monetQuote = buildDescribe(140,40,2,'https://i.imgur.com/v6E4W94.png');
-	monetQuote.position.set(-160, 65, 101);
+	monetQuote.position.set(-160, 65, 102);
 	monetQuote.rotation.y = Math.PI;
 	
 	d0 = buildDescribe(20,10,2,'https://i.imgur.com/5bIgh8t.jpg');
@@ -233,7 +281,7 @@ function init() {
 	d0.rotation.y = Math.PI/2;
 	
 	d1 = buildDescribe(18,10,2,'https://i.imgur.com/6JCBE71.jpg');
-	d1.position.set(-185, 35, 108);
+	d1.position.set(-185, 38, 108);
 	d2 = buildDescribe(20,10,2,'https://i.imgur.com/ai3znUV.jpg');
 	d2.position.set(-75, 35, 108);
 	
@@ -247,13 +295,13 @@ function init() {
 	d5 = buildDescribe(18,10,2,'https://i.imgur.com/h97eCdC.jpg');
 	d5.position.set(141, 45, -3);
 	d5.rotation.y = -Math.PI;
-	d6 = buildDescribe(20,10,2,'https://i.imgur.com/1WSoFHO.jpg');
+	d6 = buildDescribe(20,10,2,'https://i.imgur.com/mTFkEWd.jpg');
 	d6.position.set(83, 30, -125);
 	d6.rotation.y = Math.PI/2;
 	
-	d7 = buildDescribe(18,10,2,'https://i.imgur.com/wihnx55.jpg');
+	d7 = buildDescribe(18,10,2,'https://i.imgur.com/1WSoFHO.jpg');
 	d7.position.set(205, 40, 3);
-	d8 = buildDescribe(18,10,2,'https://i.imgur.com/mTFkEWd.jpg');
+	d8 = buildDescribe(18,10,2,'https://i.imgur.com/wihnx55.jpg');
 	d8.position.set(83, 28, 55);
 	d8.rotation.y = Math.PI/2;
 	
@@ -264,16 +312,14 @@ function init() {
 	
 	MainLight1 = new Lamps(180, 160, -100, 0, 1); 
 	MainLight2 = new Lamps(180, 160, 100, 0, 1); 	
-	MainLight3 = new Lamps(-200, 160, 180, 0, 1);
-	MainLight4 = new Lamps(-200, 160, -180, 0, 1);
+	MainLight3 = new Lamps(-200, 160, 170, 0, 1);
+	MainLight4 = new Lamps(-200, 160, -170, 0, 1);
 	
 	drawLight1 = new Lamps(-190, 145, 160, draw1, 2); 
 	drawLight2 = new Lamps(-130, 145, 160, draw2, 2); 
 	
 	drawLight3 = new Lamps(-190, 145, -160, draw3, 2); 
 	drawLight4 = new Lamps(-130, 145, -160, draw4, 2);
-	//drawLight3.rotation.y = Math.PI;
-	//drawLight4.rotation.y = Math.PI;
 	
 	drawLight5 = new Lamps(180, 145, -60, draw5, 2); 
 	drawLight6 = new Lamps(140, 145, -100, draw6, 2); 
@@ -281,10 +327,10 @@ function init() {
 	drawLight7 = new Lamps(180, 145, 60, draw7, 2); 
 	drawLight8 = new Lamps(140, 145, 100, draw8, 2); 
 	
-	var MainLights = [MainLight1, MainLight2, MainLight3, MainLight4, 
+	var MainLights = [MainLight1, MainLight2, MainLight3, MainLight4,
 	drawLight1, drawLight2, drawLight3, drawLight4, 
 	drawLight5, drawLight6, drawLight7, drawLight8];
-	
+
 	$('#LightPower').change(function() {
 		for(let i = 0; MainLights[i] != null; i++)
 			MainLights[i].controlLamps($(this).val());
@@ -293,12 +339,31 @@ function init() {
 	
 ///light
 
-	let sunLight = new THREE.DirectionalLight(0xdddddd, 0.2); // color, intensity, distance, decay
-    sunLight.position.set(100, 5, -150);
-	let sunLight2 = new THREE.DirectionalLight(0xdddddd, 0.2); // color, intensity, distance, decay
-    sunLight2.position.set(100, 5, 150);
+	let sunLight1 = new THREE.DirectionalLight(0xdddddd, 0.2); 
+    sunLight1.position.set(-200, 70, -160);
+	sunLight1.target = wallHallway1;
 	
-    scene.add(sunLight, sunLight2);
+	let sunLight2 = new THREE.DirectionalLight(0xdddddd, 0.2); 
+    sunLight2.position.set(-200, 70, 160);
+	sunLight2.target = wallHallway2;
+	
+	let sunLight = new THREE.DirectionalLight(0xdddddd, 0.3); 
+    sunLight.position.set(0,100,0);
+	sunLight.target = floor;
+	
+	sunLight.castShadow = true;
+	sunLight.shadow.mapSize.width = 1024;
+	sunLight.shadow.mapSize.height = 1024;
+	sunLight.shadow.camera.left = -180;
+	sunLight.shadow.camera.top = -180;
+	sunLight.shadow.camera.right = 180;
+	sunLight.shadow.camera.bottom = 180;
+	sunLight.shadow.camera.near = 10;
+	sunLight.shadow.camera.far = 300;
+	sunLight.shadow.bias = -.01	
+	
+	
+    scene.add(sunLight, sunLight1, sunLight2);
 	
 ///Track Light
 	Track = buildTrack(100, 3, 3);
@@ -322,17 +387,33 @@ function init() {
 	Track7.position.set (0, 0, 200);
 	
 	scene.add (Track, Track2, TrackGroup, Track7);
+	
+/// Warning
+	noRunning = buildDescribe(30,30,2, 'https://i.imgur.com/p1riBCP.png');
+	noRunning.position.set (-200, 70, 198);
+	noRunning.rotation.y = Math.PI;
+	
+	noPhoto = buildDescribe(30,30,2,'https://i.imgur.com/8YTJAfF.png');
+	noPhoto.position.set (-170, 70, 198);
+	noPhoto.rotation.y = Math.PI;
+	
+	noTouch = buildDescribe(30,30,2,'https://i.imgur.com/AQTSHOq.png');
+	noTouch.position.set (-140, 70, 198);
+	noTouch.rotation.y = Math.PI;
+	
+	scene.add (noRunning, noPhoto, noTouch);
 }
 
 function buildFloor(){
 	
-  let woodTex = new THREE.TextureLoader().load("https://i.imgur.com/ghTlNP0.jpg");
-  let mat = new THREE.MeshLambertMaterial({
-    map: woodTex
-  });
-  var floorTop = new THREE.Mesh(new THREE.BoxGeometry(520, 2, 400), mat);
+	let woodTex = new THREE.TextureLoader().load("https://i.imgur.com/ghTlNP0.jpg");
+	let mat = new THREE.MeshLambertMaterial({
+		map: woodTex
+	});
+	var floor = new THREE.Mesh(new THREE.BoxGeometry(520, 2, 400), mat);
+	floor.receiveShadow = true;
 	
-  return floorTop;
+	return floor;
 
 }
 
@@ -342,6 +423,14 @@ function buildWalls(w, h, d, style) {
 		wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({
 		color: 0xFFF3EE	
 		}));
+		wall.traverse(
+			function(body) {
+			  if (body instanceof THREE.Mesh) {
+				body.castShadow = true
+				body.receiveShadow = true
+			  }
+			}
+		);
 	}
 	if(style === 2){
 		wall = new THREE.Mesh(new THREE.PlaneGeometry(w, h, d), new THREE.MeshLambertMaterial({
@@ -353,7 +442,7 @@ function buildWalls(w, h, d, style) {
 
 function buildChair() {
 	var ChairGroup = new THREE.Group();
-	var woodTex = new THREE.TextureLoader().load("https://i.imgur.com/DrvlmNW.jpg?1");
+	var woodTex = new THREE.TextureLoader().load("https://i.imgur.com/HKDUE65.jpg");
 	var mat = new THREE.MeshLambertMaterial({
 		map: woodTex
 	});
@@ -364,6 +453,15 @@ function buildChair() {
 	boxLeg1.position.set(-30.5, 12, 0);
 	boxLeg2.position.set(30.5, 12, 0);
 	ChairGroup.add(boxTop, boxLeg1, boxLeg2);
+	
+	ChairGroup.traverse(
+		function(body) {
+		  if (body instanceof THREE.Mesh) {
+			body.castShadow = true
+			body.receiveShadow = true
+		  }
+		}
+	);
 	return ChairGroup;
 }
 
@@ -447,8 +545,6 @@ function animate() {
 	viewpoint();
 	requestAnimationFrame(animate);
 	
-	//camera3rd.position.set(0, 100, 0);
-	//camera3rd.lookAt (100,100,100);
 	
 	if (useview)
 		renderer.render(scene, camera3rd);
