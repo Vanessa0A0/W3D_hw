@@ -100,6 +100,9 @@ class Lamps{
 
 var camera, scene, renderer, camera3rd, useview = false;
 var keyboard = new KeyboardState();
+var alpha = 0, tmpAlpha = 0;
+var Looking, standAt;
+var helper1, helper2, helper3, check = false, LastHelper = 0;
 
 init();
 animate();
@@ -115,7 +118,7 @@ function init() {
 	renderer.shadowMap.type = THREE.PCFSoftShadowMap;///shadow
 	
 	document.body.appendChild(renderer.domElement);
-
+	
 	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
 	camera.position.z = 500; // camera at (0,0,500)
 	camera.position.y = 200;
@@ -127,62 +130,94 @@ function init() {
 	//let controls2 = new THREE.OrbitControls(camera3rd, renderer.domElement);
 
 //////////////////////////////////////////////////////////
+
 ///Look At Draw
 	$('#lookAtDraws').change( function(){
+		alpha = 0;
+		tmpAlpha = 0;
+		check = false;
 		switch ($(this).val()) {
 			case "0":
-				camera.position.set(0, 200, 500);
-				camera.lookAt(0, 0, 0);
+				Looking = new THREE.Vector3(0, 0, 0);
+				standAt = new THREE.Vector3(0, 200, 500);
+				//camera.position.set(0, 200, 500);
+				//camera.lookAt(0, 0, 0);
 				break;
-				
+					
 			case "1":
-				camera.position.set(-160, 65, 0);
-				camera.lookAt(draw0.position);
+				Looking = draw0.position; 
+				standAt = new THREE.Vector3(-160, 65, 0);
+
 				break;
 				
 			case "2":
-				camera.position.set(-210, 70, 180);
-				camera.lookAt(draw1.position);
+				Looking = draw1.position; 
+				standAt = new THREE.Vector3(-210, 70, 180);
+				//camera.position.set(-210, 70, 180);
+				//camera.lookAt(draw1.position);
 				break;
 			
 			case "3":
-				camera.position.set(-120, 70, 190);
-				camera.lookAt(draw2.position);
+				Looking = draw2.position; 
+				standAt = new THREE.Vector3(-120, 70, 190);
+				//camera.position.set(-120, 70, 190);
+				//camera.lookAt(draw2.position);
 				break;
 				
 			case "4":
-				camera.position.set(170, 70, 90);
-				camera.lookAt(draw8.position);
+				Looking = draw8.position; 
+				standAt = new THREE.Vector3(170, 70, 90);
+				//camera.position.set(170, 70, 90);
+				//camera.lookAt(draw8.position);
 				break;
 				
 			case "5":
-				camera.position.set(180, 70, 70);
-				camera.lookAt(draw7.position);
+				Looking = draw7.position; 
+				standAt = new THREE.Vector3(180, 70, 70);
+				//camera.position.set(180, 70, 70);
+				//camera.lookAt(draw7.position);
 				break;
-				
+					
 			case "6":
-				camera.position.set(180, 70, -70);
-				camera.lookAt(draw5.position);
+				Looking = draw5.position; 
+				standAt = new THREE.Vector3(180, 70, -70);
+				//camera.position.set(180, 70, -70);
+				//camera.lookAt(draw5.position);
 				break;
 				
 			case "7":
-				camera.position.set(170, 70, -90);
-				camera.lookAt(draw6.position);
+				Looking = draw6.position; 
+				standAt = new THREE.Vector3(170, 70, -90);
+				//camera.position.set(170, 70, -90);
+				//camera.lookAt(draw6.position);
 				break;
 				
 			case "8":
-				camera.position.set(-115, 70, -190);
-				camera.lookAt(draw4.position);
+				Looking = draw4.position; 
+				standAt = new THREE.Vector3(-115, 70, -190);
+				//camera.position.set(-115, 70, -190);
+				//camera.lookAt(draw4.position);
 				break;
 				
 			case "9":
-				camera.position.set(-205, 70, -180);
-				camera.lookAt(draw3.position);
+				Looking = draw3.position; 
+				standAt = new THREE.Vector3(-205, 70, -180);
+				//camera.position.set(-205, 70, -180);
+				//camera.lookAt(draw3.position);
 				break;
 		}
-	
 	});
+///Helper
+	helper = CameraMoveHelper(1,1,1);
+	helper1 = helper.clone();
+	helper1.position.set(67, 70, 200);
 	
+	helper2 = helper.clone();
+	helper2.position.set(67, 70, 0);
+	
+	helper3 = helper.clone();
+	helper3.position.set(67, 70, -200);
+		
 ///Chairs
 	var chair = buildChair();
 	var chair1 = chair.clone();
@@ -507,6 +542,18 @@ function buildDescribe(w, h, d, describeLink){
 	return describes;
 }
 
+function CameraMoveHelper(w, h, d){
+
+	var MoveHelper = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshBasicMaterial({color: 0x00ff00}));
+	
+	return MoveHelper;
+}
+
+function clamp(v, lo, hi) {
+   if (v < lo) return lo;
+   if (v > hi) return hi;
+   return v;
+}
 function viewpoint() {
 
 	
@@ -524,6 +571,7 @@ function viewpoint() {
 		//camera3rd.rotation.y -= 0.01;
 		
 	}if (keyboard.pressed("W")) {
+		if(camera3rd.translateZ)
 		camera3rd.translateZ(-1);
 		//if()
 		//camera3rd.posiiton.x += 0.05;	
@@ -545,15 +593,58 @@ function viewpoint() {
 		camera3rd.translateY(-1);
 	}
 }
+function MoveTo(LastHelper){
+	if(standAt.z > 80){
+		if(LastHelper === 1)
+			check = true;
+		else
+			camera.position.lerpVectors (camera.position, helper1.position, tmpAlpha);
+	}else if(standAt.z < -80){
+		if(LastHelper === 3)
+			check = true;
+		else
+			camera.position.lerpVectors (camera.position, helper3.position, tmpAlpha);
+	}else{
+		if(LastHelper === 2)
+			check = true;
+		else
+			camera.position.lerpVectors (camera.position, helper2.position, tmpAlpha);
+	}
+}
 function animate() {
 	viewpoint();
 	requestAnimationFrame(animate);
-	
-	
-	if (useview)
+
+	if (useview){
 		renderer.render(scene, camera3rd);
-	else
+	}
+	else{
 		renderer.render(scene, camera);
+		tmpAlpha += 0.005;
+		tmpAlpha = clamp (alpha, 0, 1);
+		alpha += 0.005;
+		alpha = clamp (alpha, 0, 1);
+		
+		if(Math.abs(Math.abs(camera.position.z) - Math.abs(standAt.z)) > 20 & check === false){
+			if(camera.position.x < 64 || camera.position.x > 69){
+				if(camera.position.z > 80){
+					LastHelper = 1;
+					camera.position.lerpVectors (camera.position, helper1.position, tmpAlpha);
+				}else if(camera.position.z < -80){
+					LastHelper = 3;
+					camera.position.lerpVectors (camera.position, helper3.position, tmpAlpha);
+				}else{
+					LastHelper = 2;
+					camera.position.lerpVectors (camera.position, helper2.position, tmpAlpha);
+				}
+			}else {
+				MoveTo(LastHelper);
+			}
+		}else{		
+			camera.position.lerpVectors (camera.position, standAt, alpha);
+			camera.quaternion.slerpQuaternions (camera.quaternion, camera.lookAt(Looking), alpha);
+		}
+	}
 }
 
 </script>
