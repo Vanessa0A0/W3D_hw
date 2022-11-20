@@ -102,7 +102,7 @@ var camera, scene, renderer, camera3rd, useview = false;
 var keyboard = new KeyboardState();
 var alpha = 0, tmpAlpha = 0;
 var Looking, standAt;
-var helper1, helper2, helper3, check = false, LastHelper = 0;
+var helper1, helper2, helper3, check = false, LastHelper = 0, Ctype = false;
 
 init();
 animate();
@@ -135,7 +135,7 @@ function init() {
 	$('#lookAtDraws').change( function(){
 		alpha = 0;
 		tmpAlpha = 0;
-		check = false;
+		check = false; Ctype = false;
 		switch ($(this).val()) {
 			case "0":
 				Looking = new THREE.Vector3(0, 0, 0);
@@ -595,21 +595,22 @@ function viewpoint() {
 }
 function MoveTo(LastHelper){
 	if(standAt.z > 80){
-		if(LastHelper === 1)
+		if(LastHelper === 1 || camera.position.x - helper1.position.x < 5)
 			check = true;
 		else
 			camera.position.lerpVectors (camera.position, helper1.position, tmpAlpha);
 	}else if(standAt.z < -80){
-		if(LastHelper === 3)
+		if(LastHelper === 3 || camera.position.x - helper3.position.x < 5)
 			check = true;
 		else
 			camera.position.lerpVectors (camera.position, helper3.position, tmpAlpha);
 	}else{
-		if(LastHelper === 2)
+		if(LastHelper === 2 || camera.position.x - helper2.position.x < 5)
 			check = true;
 		else
 			camera.position.lerpVectors (camera.position, helper2.position, tmpAlpha);
 	}
+	
 }
 function animate() {
 	viewpoint();
@@ -625,8 +626,23 @@ function animate() {
 		alpha += 0.005;
 		alpha = clamp (alpha, 0, 1);
 		
-		if(Math.abs(Math.abs(camera.position.z) - Math.abs(standAt.z)) > 20 & check === false){
-			if(camera.position.x < 64 || camera.position.x > 69){
+		let a = 0, b = 0;
+		
+		if(camera.position.z >= 0 & standAt.z >= 0){
+			a = camera.position.z;
+			b = standAt.z;
+		}else if(camera.position.z < 0 & standAt.z < 0){
+			a = camera.position.z;
+			b = standAt.z;
+		}else if(camera.position.z > standAt.z){
+			a = camera.position.z;
+			b = standAt.z;
+		}else{
+			b = camera.position.z;
+			a = standAt.z;
+		}
+		if(Math.abs(a - b) > 20 & check === false){
+			if(camera.position.x < 65 || camera.position.x > 69){
 				if(camera.position.z > 80){
 					LastHelper = 1;
 					camera.position.lerpVectors (camera.position, helper1.position, tmpAlpha);
@@ -644,6 +660,7 @@ function animate() {
 			camera.position.lerpVectors (camera.position, standAt, alpha);
 			camera.quaternion.slerpQuaternions (camera.quaternion, camera.lookAt(Looking), alpha);
 		}
+		
 	}
 }
 
