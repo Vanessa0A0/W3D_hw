@@ -31,6 +31,6 @@
 	⚠️會穿牆
 	2022.11.17 更新Camera
 
-###Patio Design
+### Patio Design
 	可裝飾的露臺，有可選轉的椅子、桌子，可存檔讀檔
 
