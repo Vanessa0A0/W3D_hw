@@ -1,0 +1,462 @@
+<h1 style="text-align:center"> Patio Design </h1>
+<hr>
+<div id="container" style="float:left; margin:3px; width:60vw; height:40vw">
+</div>
+
+<div style="float:left; margin-left: 10px; width:32vw;">
+	<input type='checkbox' id='lightStatus' value='light'>Light
+	<br>Rotate:
+	<input id="rotate" type="range" min=0 max=6.28 value=0 step=0.01>
+  <div style='border-style:solid;border-width:1px;border-color:#FFBB77;background-color:#FFE8BF'>
+    Create:
+    <br>
+	<label>
+    <input type=radio name='create' class='create' value='chair' checked>chair
+	</label>
+	<label>
+    <input type=radio name='create' class='create' value='table'>table
+	</label>
+	<br>
+	<img src="https://i.imgur.com/wcQyMXY.png" width="100vw" height="100vw" object-fit="cover" id='pic' border="1">
+	
+  </div>
+	<br>
+	<div style='border-style:solid;border-width:1px;border-color:#C48888;background-color:#EBD6D6'>
+	Tool:
+	<br>
+	<label>
+    <input type=radio name='tool' class='tool' value='place' checked>place
+	</label>
+	<label>
+    <input type=radio name='tool' class='tool' value='move'>move
+	</label>
+	<label>
+    <input type=radio name='tool' class='tool' value='remove'>remove
+	</label>
+  </div>
+  <br>
+  <button id='clear'>Clear</button>
+  <button id='save'>Save</button>
+  <button id='restore'>Restore</button>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script>
+
+var camera, scene, renderer, controls;
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+var pickplane, thePuck;
+var cyl = new THREE.Object3D(), lightStatus = false, Light;
+var furniture = [];
+init();
+animate();
+
+$('#lightStatus').click(function() {
+  lightStatus = !lightStatus;
+  if (lightStatus === true) {
+    scene.add(Light);
+  } else {
+    scene.remove(Light);
+  }
+})
+
+$('#rotate').change(function() {
+  cyl.rotation.y = $('#rotate').val();
+});
+
+$('input[class=tool]').change(function() {
+  if ($('input[class=tool]:radio:checked').val() === 'place') {
+    cyl.visible = true;
+  } else{
+    cyl.visible = false;
+  }
+});
+
+
+$('input[name=create]').change(function() {
+  scene.remove(cyl);
+   if ($('input[class=create]:radio:checked').val() === 'chair') {
+    cyl = chair();
+    $("#pic").attr("src", "https://i.imgur.com/wcQyMXY.png");
+  } else{
+    cyl = table();
+    $("#pic").attr("src", "https://i.imgur.com/GUq5sXe.png");
+  }
+  cyl.rotation.y = $('#rotate').val();
+  /*if ($('input[class=tool]:radio:checked').val() != 'place') {
+    cyl.visible = false;
+  }*/
+  scene.add(cyl);
+})
+/*
+$('input[class=create]').change(function() {
+  if ($('input[class=create]:radio:checked').val() === 'chair') {
+    $("#pic").attr("src", "https://i.imgur.com/wcQyMXY.png");
+  } else {
+    $("#pic").attr("src", "https://i.imgur.com/GUq5sXe.png");
+  }
+});
+*/
+$('#clear').click(function() {
+
+  furniture.forEach(function(furnitureGroup) {
+    scene.remove(furnitureGroup);
+  });
+
+  furniture = [];
+});
+
+$('#save').click(function() {
+
+  var states = [];
+  furniture.forEach(function(furnitureGroup) {
+    states.push(furnitureGroup.name);
+  });
+  
+  localStorage.setItem('stateStr', JSON.stringify(states));
+
+});
+
+$('#restore').click(function() {
+  furniture.forEach(function(furnitureGroup) {
+    scene.remove(furnitureGroup);
+  });
+
+  furniture = [];
+  var states = JSON.parse(localStorage.getItem('stateStr'));
+  states.forEach(function(stateStr) {
+
+    var state = JSON.parse(stateStr);
+    if (state.type === 1)
+      buildChair(state.rot, new THREE.Vector3(state.pos[0], 0, state.pos[1]));
+    if (state.type === 2)
+      buildTable(state.rot, new THREE.Vector3(state.pos[0], 0, state.pos[1]));
+  });
+
+});
+function chair(){
+let texture = new THREE.TextureLoader().load('https://i.imgur.com/R6fyS1l.jpg');
+  let metalTexture = new THREE.TextureLoader().load('https://i.imgur.com/O4ywToo.jpg');
+  let pillowTexture = new THREE.TextureLoader().load('https://i.imgur.com/L4Xj7VR.jpg');
+  
+  var furnitureGroup = new THREE.Group();
+  var chairTop = new THREE.Mesh(new THREE.BoxGeometry(20, 3, 20), new THREE.MeshLambertMaterial({
+    map: texture
+  }));
+  var chairSeat = new THREE.Mesh(new THREE.BoxGeometry(17, 1, 17), new THREE.MeshLambertMaterial({
+    map: pillowTexture
+  }));
+  var chairBack = new THREE.Mesh(new THREE.BoxGeometry(2, 15, 20), new THREE.MeshLambertMaterial({
+    map: texture
+  }));
+  var chairLeg = new THREE.Mesh(new THREE.BoxGeometry(2, 20, 2), new THREE.MeshLambertMaterial({
+    map: metalTexture
+  }));
+  var chairLegL1 = chairLeg.clone();
+  var chairLegL2 = chairLeg.clone();
+  var chairLegL3 = new THREE.Mesh(new THREE.BoxGeometry(15, 2, 2), new THREE.MeshLambertMaterial({
+    map: metalTexture
+  }));
+  
+  chairSeat.position.set(0, 13.5, 0);
+  chairTop.position.set(0, 12, 0);
+  chairLegL1.position.set(-8.5, 12, -11);
+  chairLegL2.position.set(8.5, 12, -11);
+  chairLegL3.position.set(0, 21, -11);
+  //chairLeg1.rotation.y = Math.PI / 4;
+
+  chairLegR1 = chairLegL1.clone();
+  chairLegR1.position.set(-8.5, 12, 11);
+  chairLegR2 = chairLegL2.clone();
+  chairLegR2.position.set(8.5, 12, 11);
+  chairLegR3 = chairLegL3.clone();
+  chairLegR3.position.set(0, 21, 11);
+  
+  let a = 1 / Math.tan(Math.PI / 2.3)
+  localX = new THREE.Vector3(1, 0, 0)
+  localY = new THREE.Vector3(a, 1, 0)
+  localZ = new THREE.Vector3(0, 0, 1)
+  chairBack.matrix.makeBasis(localX, localY, localZ);
+  chairBack.matrix.setPosition(10.5, 21, 0);
+  //chairLeg.matrix.setRotation = Math.PI / 2;
+  chairBack.matrixAutoUpdate = false;
+
+  furnitureGroup.add(chairTop, chairSeat, chairBack, chairLegL1, chairLegL2, chairLegL3, chairLegR1, chairLegR2, chairLegR3);
+  //chairGroup.position.set(-12.5, 41, 0);
+  return furnitureGroup;
+}
+
+function buildChair(rot, pos) {
+  furnitureGroup = chair();
+  scene.add(furnitureGroup);
+
+
+  var prop = {
+	type: 1,
+	rot: rot,
+    pos: [pos.x, pos.z]
+  };
+  furnitureGroup.name = JSON.stringify(prop);
+  furniture.push(furnitureGroup);
+  furnitureGroup.position.copy(pos);
+  furnitureGroup.rotation.y = rot;
+  //furnitureGroup.lookAt(rot);
+  ///////////////////////////////////////////////////////////////////////////
+  /*
+    var sphere = new THREE.Mesh(new THREE.SphereGeometry(rad, 20, 20), new THREE.MeshNormalMaterial());
+	
+    scene.add(sphere);
+    var prop = {
+      rad: rad,
+      pos: [pos.x, pos.z]
+    };
+    console.log(prop);
+    sphere.name = JSON.stringify(prop);
+    console.log(sphere.name);
+
+    spheres.push(sphere);
+    sphere.position.copy(pos);
+  */
+}
+
+function table() {
+let texture = new THREE.TextureLoader().load('https://i.imgur.com/R6fyS1l.jpg');
+  let metalTexture = new THREE.TextureLoader().load('https://i.imgur.com/O4ywToo.jpg');
+  var furnitureGroup = new THREE.Group();
+  var tableTop = new THREE.Mesh(new THREE.BoxGeometry(30, 3, 30), new THREE.MeshBasicMaterial({
+    map: texture
+  }));
+  var tableLeg = new THREE.Mesh(new THREE.BoxGeometry(3, 23.5, 3), new THREE.MeshBasicMaterial({
+    map: metalTexture
+  }));
+  tableLegL1 = tableLeg.clone();
+  tableLegL2 = tableLeg.clone();
+  var tableLegL3 = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 24), new THREE.MeshBasicMaterial({
+    map: metalTexture
+  }));
+  
+  tableTop.position.set(0, 25, 0);
+  tableLegL1.position.set(-13.5, 11.8, 13.5);
+  tableLegL2.position.set(-13.5, 11.8, -13.5);
+  tableLegL3.position.set(-13.5, 1.6, 0);
+  
+  tableLegR1 = tableLegL1.clone();
+  tableLegR1.position.set(13.5, 11.8, 13.5);
+  tableLegR2 = tableLegL2.clone();
+  tableLegR2.position.set(13.5, 11.8, -13.5);
+  tableLegR3 = tableLegL3.clone();
+  tableLegR3.position.set(13.5, 1.6, 0);
+  
+  furnitureGroup.add(tableTop, tableLegL1, tableLegL2, tableLegL3, tableLegR1, tableLegR2, tableLegR3);
+  return furnitureGroup;
+}
+function buildTable(rot, pos) {
+  furnitureGroup = table();
+  scene.add(furnitureGroup);
+  
+  var prop = {
+    type: 2,
+	rot: rot,
+    pos: [pos.x, pos.z]
+  };
+  furnitureGroup.name = JSON.stringify(prop);
+  furniture.push(furnitureGroup);
+  //pickables.push(furnitureGroup);
+  furnitureGroup.position.copy(pos);
+  furnitureGroup.rotation.y = rot;
+}
+
+function init() {
+
+  var ww = $("#container").innerWidth();
+  var hh = $("#container").innerHeight();
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(ww, hh);
+  renderer.setClearColor(0x888888);
+  $("#container").append(renderer.domElement);
+
+  ////////////////////////////////////////////////
+
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(50, ww / hh, 1, 1000);
+  camera.position.z = 300;
+  camera.position.y = 200;
+  scene.add(camera);
+  
+  let LightAround = new THREE.DirectionalLight(0xffffff, 0.5);
+  LightAround.position.set(0, 20, 0);
+  scene.add(LightAround);
+  
+  Light = new THREE.PointLight(0xffffff, 0.8);
+  Light.position.set(0, 100, 0)
+  
+  
+  cyl = chair();
+  scene.add(cyl);
+ /* 
+  var cyl_geom = new THREE.RingGeometry(5, 10, 32);
+  var cyl_mat = new THREE.MeshBasicMaterial({
+    color: 0xff1234,
+  });
+  cyl = new THREE.Mesh(cyl_geom, cyl_mat);
+  cyl.rotation.x = -Math.PI / 2;
+  cyl.position.set(-20, 0, 20);
+  scene.add(cyl);
+*/
+  pickplane = new THREE.Mesh(new THREE.PlaneGeometry(200, 200),
+    new THREE.MeshBasicMaterial({
+      color: 0xff1234
+    }));
+  pickplane.rotation.x = -Math.PI / 2;
+  scene.add(pickplane);
+  pickplane.material.visible = false;
+
+  var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
+  //scene.add(gridXZ);
+  var loader = new THREE.TextureLoader();
+  var floorGroup = new THREE.Group();
+  var grassMap = loader.load ('https://i.imgur.com/IkYcp2C.jpg');
+  var grassAlpha = loader.load ('https://i.imgur.com/zeMvlwR.jpg');
+  var grassFloor = new THREE.Mesh (new THREE.PlaneGeometry (200,200), new THREE.MeshLambertMaterial({map: grassMap, transparent:true, alphaMap: grassAlpha, side: THREE.DoubleSide}));
+
+  var stoneMap = loader.load ('https://i.imgur.com/8HjsDNT.jpg');
+  var stoneAlpha = loader.load ('https://i.imgur.com/onx4CtK.jpg');
+  var stoneFloor = new THREE.Mesh (new THREE.PlaneGeometry (200,200), new THREE.MeshLambertMaterial({map: stoneMap, transparent:true, alphaMap: stoneAlpha, side: THREE.DoubleSide}));
+  
+  var stoneMap2 = loader.load ('https://i.imgur.com/vRLmmGb.jpg');
+  var stoneAlpha2 = loader.load ('https://i.imgur.com/gUFLMD5.jpg');
+  var stoneFloor2 = new THREE.Mesh (new THREE.PlaneGeometry (200,200), new THREE.MeshLambertMaterial({map: stoneMap2, transparent:true, alphaMap: stoneAlpha2, side: THREE.DoubleSide}));
+  
+  floorGroup.add (grassFloor, stoneFloor, stoneFloor2);
+  scene.add (floorGroup);
+  
+  floorGroup.rotation.x = -Math.PI/2;
+
+  
+
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  window.addEventListener('resize', onWindowResize, false);
+  $('#container').on("pointerdown", onMouseDown);
+  $('#container').on("pointermove", onMouseMove);
+  $('#container').on("pointerup", onMouseUp);
+
+
+}
+
+function onWindowResize() {
+  var ww = $("#container").innerWidth();
+  var hh = $("#container").innerHeight();
+
+  camera.aspect = ww / hh;
+  camera.updateProjectionMatrix();
+  renderer.setSize(ww, hh);
+}
+
+function onMouseMove(event) {
+
+  event.preventDefault();
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObject(pickplane);
+
+  if (intersects.length > 0) {
+
+    document.body.style.cursor = 'pointer';
+    cyl.position.copy(intersects[0].point);
+    cyl.position.y = 2;
+    if (thePuck === null) return;
+	if ($('input[class=tool]:radio:checked').val() === 'move') {//move
+		controls.enabled = false; // to disable camera movement
+		keepy = thePuck.position.y;
+		thePuck.position.copy(intersects[0].point);
+		thePuck.position.y = keepy;
+	////save pos
+		for (let i = 0; i < furniture.length; i++) {
+		  if (furniture[i] == thePuck) {
+			furniture[i].name = JSON.parse(furniture[i].name);
+			furniture[i].name.pos[0] = intersects[0].point.x;
+			furniture[i].name.pos[1] = intersects[0].point.z;
+			furniture[i].name = JSON.stringify( furniture[i].name);
+			//break;
+		  }
+		}
+    }
+  } else {
+    document.body.style.cursor = 'auto';
+  }
+
+}
+
+function onMouseUp(event) {
+  thePuck = null;
+  controls.enabled = true;
+}
+
+function onMouseDown(event) {
+
+  event.preventDefault();
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  //var intersects = raycaster.intersectObject(pickplane);
+  //var intersects1 = raycaster.intersectObjects(pickables, true);
+
+  if ($('input[class=tool]:radio:checked').val() === 'place') { // place
+    var intersects = raycaster.intersectObject(pickplane);
+    if (intersects.length > 0) {
+      cyl.position.copy(intersects[0].point);
+      if ($('input[class=create]:radio:checked').val() === 'chair'){
+        buildChair($('#rotate').val(), intersects[0].point);
+      }if ($('input[class=create]:radio:checked').val() === 'table'){
+        buildTable($('#rotate').val(), intersects[0].point);
+	  }
+    }
+  } else if ($('input[class=tool]:radio:checked').val() === 'move') {//move
+    var intersects = raycaster.intersectObjects(furniture);
+    if (intersects.length > 0) {
+      thePuck = intersects[0].object.parent;
+    }
+  } else if ($('input[class=tool]:radio:checked').val() === 'remove') { // remove
+    var intersects = raycaster.intersectObjects(furniture);
+    if (intersects.length > 0) {
+      thePuck = intersects[0].object.parent;
+
+      //scene.remove(thePuck);
+      thePuck.removeFromParent();
+
+      // remove thePuck from pucks
+      for (let i = 0; i < furniture.length; i++) {
+        if (furniture[i] === thePuck) {
+          furniture.splice(i, 1);
+          break;
+        }
+      }
+
+    }
+
+  }
+}
+
+function animate() {
+
+  controls.update();
+  requestAnimationFrame(animate);
+  render();
+}
+
+function render() {
+  renderer.render(scene, camera);
+}
+</script>

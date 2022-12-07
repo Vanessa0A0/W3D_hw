@@ -12,6 +12,10 @@
 
 -3️⃣ [室內設計模型](#室內設計模型)✅
 
+-4️⃣[Patio Design](#Patio-Design)✅
+
+-5️⃣
+
 ![](https://github.com/Vanessa0A0/W3D_hw/blob/master/Images/SLir.gif)
 
 
@@ -26,3 +30,5 @@
 	畫廊設計模型，可用space切換視角，切換後WASD移動、QE旋轉、上下鍵移動鏡頭上下
 	⚠️會穿牆
 	2022.11.17 更新Camera
+
+###Patio Design
