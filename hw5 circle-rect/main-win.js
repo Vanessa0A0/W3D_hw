@@ -6,12 +6,17 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/Homework 5.html');
 });
 
-app.get ('/api', function (req, res) {
-
-	var K = req.query.K;
-	var t = req.query.t;
+app.get ('/api', function (req, res) {	
+	
+	var x_center = req.query.x_center;
+	var y_center = req.query.y_center;
+	var radius = req.query.radius;
+	var x1 = req.query.x1;
+	var y1 = req.query.y1;
+	var x2 = req.query.x2;
+	var y2 = req.query.y2;
 		
-	shelljs.exec('./a.out ' + K + ' ' + t, function(status, output) {
+	shelljs.exec('main.exe ' + x_center + ' ' + y_center + ' ' + radius + ' ' + x1 + ' ' + y1 + ' ' + x2 + ' ' + y2, function(status, output) {
 	  console.log('Exit status:', status);
 	  console.log('Program output:', output);
 
@@ -19,8 +24,6 @@ app.get ('/api', function (req, res) {
         status: status,
         output: output
       };
-
-		
       /*
         The response header for supporting CORS:
         "Access-Control-Allow-Origin": "*",
@@ -32,7 +35,7 @@ app.get ('/api', function (req, res) {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Headers": "Content-Type"
 	  });
-	
+	  
 	  res.write( JSON.stringify(output) );
 	  res.end();
 

@@ -14,7 +14,8 @@
 
 -4️⃣[Patio Design](#Patio-Design)✅
 
--5️⃣
+-5️⃣[Circle-rect](#Circle-rect)
+
 
 ![](https://github.com/Vanessa0A0/W3D_hw/blob/master/Images/SLir.gif)
 
@@ -33,4 +34,8 @@
 
 ### Patio Design
 	可裝飾的露臺，有可選轉的椅子、桌子，可存檔讀檔
+
+### Circle-rect
+	碰撞球，球可調整半徑、長方形可移動
+	⚠️有時顏色沒變、撞長方形會太靠近才判斷到
 

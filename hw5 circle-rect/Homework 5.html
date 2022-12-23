@@ -19,7 +19,7 @@ hr.style {
 <div style="float:right; margin-left: 10px; width:30vw;">
   <div>
     radius:
-    <input id="radius" type="range" min=0.5 max=5 value=1>
+    <input id="radius" type="range" min=1 max=15 value=5>
     <!--<span id='radiusPrint'> </span>-->
     <br>
   </div>
@@ -74,34 +74,17 @@ function init() {
 
   scene = new THREE.Scene();
   //camera = new THREE.PerspectiveCamera(50, ww / hh, 1, 1000);
-  camera = new THREE.OrthographicCamera( -15, 15, 15, -15, -1, 500 );
-  camera.position.z = 10;
+  camera = new THREE.OrthographicCamera(-100, 100, 100, -100, -10, 100);
+  camera.position.z = 50;
   scene.add(camera);
 
   ////////////////////////////////////////////////
-  /*
-    pickplane = new THREE.Mesh(new THREE.PlaneGeometry(ww, hh),
-      new THREE.MeshBasicMaterial({
-        color: 0xff1234
-      }));
-    pickplane.rotation.x = -Math.PI / 2;
-    scene.add(pickplane);
-    pickplane.material.visible = false;
-  */
-  //  var gridXZ = new THREE.GridHelper(hh, 20, 'red', 'white');
-  //  gridXZ.rotation.x = Math.PI / 2;
-  //  scene.add(gridXZ);
 
-  ///////////////////////////////////////////////
-/*
-  circle = new THREE.Mesh(new THREE.CircleGeometry(10, 20, 20), new THREE.MeshBasicMaterial({
-    color: 'yellow'
-  }));
- */
  makeCircle(new THREE.Vector3(0,0,0));
-  rectangle = new THREE.Mesh(new THREE.PlaneGeometry(8, 3), new THREE.MeshBasicMaterial({
+  rectangle = new THREE.Mesh(new THREE.PlaneGeometry(60, 26), new THREE.MeshBasicMaterial({
     color: 'navy'
   }));
+  rectangle.position.set(10,3,0);
   scene.add(rectangle);
 
   pos = new THREE.Vector3();
@@ -170,58 +153,63 @@ function onMouseDown(event) {
     pick = intersects[0].object;
   }
 }
-/*
-function checkX() {
-	if(pos.x >= x1 & ){
 
-	}else if(pos.y <= y2){
-
-	}
-}
-function checkY() {
-	if(pos.y >= y1){
-
-	}else if(pos.y <= y2){
-
-	}
-}
-*/
 function animate() {
-  var dt = 0.01;
+  var dt = 0.05;
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
 
-  if (power) {
-	x1 = rectangle.position.x - 4;
-	y1 = rectangle.position.y - 1.5;
-	x2 = rectangle.position.x + 4;
-	y2 = rectangle.position.y + 1.5;
-    pos.add(vel.clone().multiplyScalar(dt));
+  if (power) { 
+	x1 = rectangle.position.x - 30;
+	y1 = rectangle.position.y - 13;
+	x2 = rectangle.position.x + 30;
+	y2 = rectangle.position.y + 13;
 	getHit(); 
-    if (pos.x > 14 || pos.x < -14){
+	pos.add(vel.clone().multiplyScalar(dt));
+    if (pos.x > 90 || pos.x < -90){
       vel.x *= -1;
 	  hitball = false;
 	  color = !color;
-    }if (pos.y > 14 || pos.y < -14){
+    }if (pos.y > 90 || pos.y < -90){
       vel.y *= -1;
 	  hitball = false;
 	  color = !color;
-	}if (hit == 1 & hitball == false){
-		hitball = true;
-		color = !color;
 	}
-	if (hit == 1){
-		if (pos.x > x1 || pos.x < x2){
-			vel.x *= -1;
-		}if (pos.y > y1 || pos.y < y2){
-			vel.y *= -1;
+	if (hit == 1 & hitball == false){
+			hitball = true;
+			color = !color;
+	}
+	/*
+	if (hit == 1 & hitball == false){
+		if ((pos.x + radius) > x1 || (pos.x + radius) < x2){
+		  vel.x *= -1;
+		}if ((pos.y + radius) > y1 || (pos.y + radius) < y2){
+		  vel.y *= -1;
 		}
 	}
+	*/
+	if (pos.x > x1 & pos.x < x2) {
+      if ((pos.y + radius) > rectangle.position.y & (pos.y - radius) < y2 & vel.y < 0) {
+        vel.y *= -1;
+      }
+      if ((pos.y + radius) > y1 & (pos.y - radius) < rectangle.position.y & vel.y > 0) {
+        vel.y *= -1;
+      }
+    }
+
+    if (pos.y > y1 & pos.y < y2) {
+      if ((pos.x + radius) > rectangle.position.x & (pos.x - radius) < x2 & vel.x < 0) {
+        vel.x *= -1;
+      }
+      if ((pos.x + radius) > x1 & (pos.x - radius) < rectangle.position.x & vel.x > 0) {
+        vel.x *= -1;
+      }
+    }
+	
 	if (color)
       circle.material.color.set('cyan');
     else
       circle.material.color.set('yellow');
-
     circle.position.copy(pos);
   }
 }

@@ -25,25 +25,25 @@ static boolean Check_Intersect(
 
  if (R->max.x < 0) 			/* R to left of circle center */
    	if (R->max.y < 0) 		/* R in lower left corner */
-     	return ((R->max.x * R->max.x + R->max.y * R->max.y) < Rad2);
+     		return ((R->max.x * R->max.x + R->max.y * R->max.y) < Rad2);
    	else if (R->min.y > 0) 	/* R in upper left corner */
-     	return ((R->max.x * R->max.x + R->min.y * R->min.y) < Rad2);
+     		return ((R->max.x * R->max.x + R->min.y * R->min.y) < Rad2);
    	else 					/* R due West of circle */
-     	return(ABS(R->max.x) < Rad);	
- else if (R->min.x > 0)  	/* R to right of circle center */
-   	if (R->max.y < 0) 	/* R in lower right corner */
-     	return ((R->min.x * R->min.x + R->max.y * R->max.y) < Rad2);
-    else if (R->min.y > 0)  	/* R in upper right corner */
-     	return ((R->min.x * R->min.x + R->min.y * R->min.y) < Rad2);
+     		return(ABS(R->max.x) < Rad);
+ 	else if (R->min.x > 0)  	/* R to right of circle center */
+   		if (R->max.y < 0) 	/* R in lower right corner */
+     			return ((R->min.x * R->min.x + R->max.y * R->max.y) < Rad2);
+   	else if (R->min.y > 0)  	/* R in upper right corner */
+     		return ((R->min.x * R->min.x + R->min.y * R->min.y) < Rad2);
    	else 				/* R due East of circle */
-     	return (R->min.x < Rad);	
- else				/* R on circle vertical centerline */
-   	if (R->max.y < 0) 	/* R due South of circle */
-   		return (ABS(R->max.y) < Rad);
+     		return (R->min.x < Rad);
+ 	else				/* R on circle vertical centerline */
+   		if (R->max.y < 0) 	/* R due South of circle */
+     		return (ABS(R->max.y) < Rad);
    	else if (R->min.y > 0)  	/* R due North of circle */
-     	return (R->min.y < Rad);
+     		return (R->min.y < Rad);
    	else 				/* R contains circle centerpoint */
-     	return(TRUE);
+     		return(TRUE);
 } 	
 
 bool CircleRectCD (double cx, double cy, double r, double min[2], double max[2])
@@ -54,7 +54,7 @@ bool CircleRectCD (double cx, double cy, double r, double min[2], double max[2])
 	C.x = cx, C.y = cy;
 	R.max.x = max[0], R.max.y = max[1]; 
 	R.min.x = min[0], R.min.y = min[1]; 
-	//printf ("%d\n", CircleRectCD (cx, cy, r, min, max));
+	
 	return Check_Intersect (&R, &C, r);	
 }
 
