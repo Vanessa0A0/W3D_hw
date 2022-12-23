@@ -1,0 +1,232 @@
+<html>
+<head>
+<style>
+hr.style { 
+  border: 0; 
+  height: 1px; 
+  background-image: -webkit-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+  background-image: -moz-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+  background-image: -ms-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+  background-image: -o-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0); 
+}
+</style>
+</head>
+<h1 style="text-align:center">Homework 5</h1>
+<hr class="style">
+<div id="container" style="float:left; margin:3px; width:40vw; height:40vw">
+</div>
+
+<div style="float:right; margin-left: 10px; width:30vw;">
+  <div>
+    radius:
+    <input id="radius" type="range" min=0.5 max=5 value=1>
+    <!--<span id='radiusPrint'> </span>-->
+    <br>
+  </div>
+  <br>
+  <button id='Start' style="width:50%">Start/Pause</button>
+</div>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script>
+
+$('#radius').change(function() {
+  let theCircle = scene.getObjectByName('theCircle');
+  let tmp = new THREE.Vector3();
+  tmp.copy(theCircle.position);
+  scene.remove(theCircle);
+  makeCircle(tmp);
+});
+
+$('#Start').click(function() {
+  power = !power;
+});
+
+var camera, scene, renderer;
+var circle, rectangle, pos, vel;
+var hit = 0;
+var x1, x2, y1, y2, radius, xCenter, yCenter;
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+var pickplane, pick;
+var power = false, color = false, hitball = false;
+init();
+animate();
+
+function getHit () {
+	// Call api 
+	// Need to be replaced by a public ip address
+	$.get( "http://127.0.0.1:1337/api?x_center=" + pos.x + "&y_center=" + pos.y + "&radius=" + radius + "&x1=" + x1 + "&y1=" + y1 + "&x2=" + x2 + "&y2=" + y2, function( data ) {
+		if(data && data.output){
+			hit = data.output;	
+		}
+	});
+}
+
+function init() {
+
+  var ww = $("#container").innerWidth();
+  var hh = $("#container").innerHeight();
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(ww, hh);
+  renderer.setClearColor(0x888888);
+  $("#container").append(renderer.domElement);
+
+  scene = new THREE.Scene();
+  //camera = new THREE.PerspectiveCamera(50, ww / hh, 1, 1000);
+  camera = new THREE.OrthographicCamera( -15, 15, 15, -15, -1, 500 );
+  camera.position.z = 10;
+  scene.add(camera);
+
+  ////////////////////////////////////////////////
+  /*
+    pickplane = new THREE.Mesh(new THREE.PlaneGeometry(ww, hh),
+      new THREE.MeshBasicMaterial({
+        color: 0xff1234
+      }));
+    pickplane.rotation.x = -Math.PI / 2;
+    scene.add(pickplane);
+    pickplane.material.visible = false;
+  */
+  //  var gridXZ = new THREE.GridHelper(hh, 20, 'red', 'white');
+  //  gridXZ.rotation.x = Math.PI / 2;
+  //  scene.add(gridXZ);
+
+  ///////////////////////////////////////////////
+/*
+  circle = new THREE.Mesh(new THREE.CircleGeometry(10, 20, 20), new THREE.MeshBasicMaterial({
+    color: 'yellow'
+  }));
+ */
+ makeCircle(new THREE.Vector3(0,0,0));
+  rectangle = new THREE.Mesh(new THREE.PlaneGeometry(8, 3), new THREE.MeshBasicMaterial({
+    color: 'navy'
+  }));
+  scene.add(rectangle);
+
+  pos = new THREE.Vector3();
+  vel = new THREE.Vector3(10, 20);
+  //////////////////////////////////////////////
+  window.addEventListener('resize', onWindowResize, false);
+  $('#container').on("pointerdown", onMouseDown);
+  $('#container').on("pointermove", onMouseMove);
+  $('#container').on("pointerup", onMouseUp);
+}
+
+function makeCircle(tmpPos){
+	circle = new THREE.Mesh(new THREE.CircleGeometry($('#radius').val(), 60), new THREE.MeshBasicMaterial({    
+    color: 'yellow'
+  }));
+  radius = $('#radius').val();
+  circle.position.set(tmpPos);
+ circle.name = 'theCircle';
+ scene.add(circle);
+}
+
+function onWindowResize() {
+  var ww = $("#container").innerWidth();
+  var hh = $("#container").innerHeight();
+  camera.aspect = ww / hh;
+  camera.updateProjectionMatrix();
+  renderer.setSize(ww, hh);
+}
+
+function onMouseUp(event) {
+  pick = null;
+}
+
+function onMouseMove(event) {
+
+  event.preventDefault();
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObject(rectangle);
+  if (intersects.length > 0) {
+    document.body.style.cursor = 'pointer';
+    if (pick === null) return;
+    pick.position.copy(intersects[0].point);
+
+
+  } else {
+    document.body.style.cursor = 'auto';
+  }
+}
+
+function onMouseDown(event) {
+
+  event.preventDefault();
+
+  var viewportPos = $('#container').get(0).getBoundingClientRect();
+  mouse.x = ((event.clientX - viewportPos.left) / $('#container').innerWidth()) * 2 - 1;
+  mouse.y = -((event.clientY - viewportPos.top) / $('#container').innerHeight()) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObject(rectangle);
+  if (intersects.length > 0) {
+    pick = intersects[0].object;
+  }
+}
+/*
+function checkX() {
+	if(pos.x >= x1 & ){
+
+	}else if(pos.y <= y2){
+
+	}
+}
+function checkY() {
+	if(pos.y >= y1){
+
+	}else if(pos.y <= y2){
+
+	}
+}
+*/
+function animate() {
+  var dt = 0.01;
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+
+  if (power) {
+	x1 = rectangle.position.x - 4;
+	y1 = rectangle.position.y - 1.5;
+	x2 = rectangle.position.x + 4;
+	y2 = rectangle.position.y + 1.5;
+    pos.add(vel.clone().multiplyScalar(dt));
+	getHit(); 
+    if (pos.x > 14 || pos.x < -14){
+      vel.x *= -1;
+	  hitball = false;
+	  color = !color;
+    }if (pos.y > 14 || pos.y < -14){
+      vel.y *= -1;
+	  hitball = false;
+	  color = !color;
+	}if (hit == 1 & hitball == false){
+		hitball = true;
+		color = !color;
+	}
+	if (hit == 1){
+		if (pos.x > x1 || pos.x < x2){
+			vel.x *= -1;
+		}if (pos.y > y1 || pos.y < y2){
+			vel.y *= -1;
+		}
+	}
+	if (color)
+      circle.material.color.set('cyan');
+    else
+      circle.material.color.set('yellow');
+
+    circle.position.copy(pos);
+  }
+}
+
+
+</script>
+</body>
+</html>
